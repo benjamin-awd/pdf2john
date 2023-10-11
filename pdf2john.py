@@ -83,7 +83,7 @@ class PdfHashExtractor:
 
         for key, data in entries.items():
             if key in ("/O", "/U"):
-                if int(revision) >= StandardSecuritySettingsRevision.AES256.value:
+                if revision >= StandardSecuritySettingsRevision.AES256.value:
                     max_length = 40
 
                 else:

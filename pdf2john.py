@@ -6,11 +6,12 @@ import sys
 
 from pyhanko.pdf_utils.crypt import StandardSecuritySettingsRevision
 from pyhanko.pdf_utils.reader import PdfFileReader
+from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
 
-class Encryption:
+class EncryptionDictionary:
     def __init__(self, pdf: PdfFileReader):
         keys = ("/U", "/O", "/UE", "/OE")
         encryption_dict = pdf._get_encryption_params()
@@ -18,26 +19,26 @@ class Encryption:
         self.entries: dict = {
             key: value for key in keys if (value := encryption_dict.get(key))
         }
-        self._algorithm: int = encryption_dict.get("/V", 0)
-        self._key_length: int = encryption_dict.get("/Length")
-        self._permissions: int = encryption_dict["/P"]
-        self._security_handler_revision: int = encryption_dict["/R"]
+        self.algorithm: int = encryption_dict.get("/V", 0)
+        self.key_length: int = encryption_dict.get("/Length")
+        self.permissions: int = encryption_dict["/P"]
+        self.revision: int = encryption_dict["/R"]
 
-    @property
-    def algorithm(self) -> str:
-        return str(self._algorithm)
 
-    @property
-    def key_length(self) -> str:
-        return str(self._key_length)
+@dataclass(kw_only=True)
+class HashGenerator:
+    algorithm: int
+    revision: int
+    key_length: int
+    permissions: int
+    encrypt_metadata: bool
+    document_id_length: int
+    document_id: str
+    passwords: list
 
-    @property
-    def permissions(self) -> str:
-        return str(self._permissions)
-
-    @property
-    def security_handler_revision(self) -> str:
-        return str(self._security_handler_revision)
+    def __post_init__(self):
+        self.passwords = "*".join(self.passwords)
+        self.hash = "$pdf$" + "*".join([str(value) for value in self.__dict__.values()])
 
 
 class PdfHashExtractor:
@@ -46,7 +47,7 @@ class PdfHashExtractor:
 
         with open(file_name, "rb") as doc:
             self.pdf = PdfFileReader(doc, strict=False)
-            self.encryption = Encryption(self.pdf)
+            self.encryption = EncryptionDictionary(self.pdf)
             self.security_handler = self.pdf.security_handler
 
     @property
@@ -58,31 +59,27 @@ class PdfHashExtractor:
         return str(int(self.security_handler.encrypt_metadata))
 
     def parse(self):
-        passwords = self.get_passwords()
-
-        encryption_info = (
-            "$pdf$"
-            + self.encryption.algorithm
-            + "*"
-            + self.encryption.security_handler_revision
-            + "*"
-            + self.encryption.key_length
+        passwords = self.get_passwords(
+            self.encryption.entries, self.encryption.revision
         )
 
-        permissions_info = self.encryption.permissions + "*" + self.encrypt_metadata
-
-        id_info = str(len(self.document_id)) + "*" + self.document_id.hex()
-
-        output = (
-            encryption_info + "*" + permissions_info + "*" + id_info + "*" + passwords
+        generator = HashGenerator(
+            algorithm=self.encryption.algorithm,
+            revision=self.encryption.revision,
+            key_length=self.encryption.key_length,
+            permissions=self.encryption.permissions,
+            encrypt_metadata=self.encrypt_metadata,
+            document_id_length=len(self.document_id),
+            document_id=self.document_id.hex(),
+            passwords=passwords,
         )
-        logger.info("Hash: %s", output)
 
-        return output
+        return generator.hash
 
-    def get_passwords(self):
+
+    @staticmethod
+    def get_passwords(entries, revision):
         passwords = []
-        entries = self.encryption.entries
 
         for key, data in entries.items():
             if key in ("/O", "/U"):
@@ -95,7 +92,7 @@ class PdfHashExtractor:
 
             passwords.extend([str(len(data)), data.hex()])
 
-        return "*".join(passwords)
+        return passwords
 
 
 if __name__ == "__main__":

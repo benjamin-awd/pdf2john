@@ -4,7 +4,7 @@ import logging
 import os
 import sys
 
-from pyhanko.pdf_utils.crypt import SecurityHandlerVersion
+from pyhanko.pdf_utils.crypt import StandardSecuritySettingsRevision
 from pyhanko.pdf_utils.reader import PdfFileReader
 
 logger = logging.getLogger(__name__)
@@ -86,15 +86,12 @@ class PdfHashExtractor:
 
         for key, data in entries.items():
             if key in ("/O", "/U"):
-                if self.security_handler.version == SecurityHandlerVersion.AES256:
-                    data = data[:40]
+                if int(revision) >= StandardSecuritySettingsRevision.AES256.value:
+                    max_length = 40
 
-                # Legacy support for older PDF specifications
-                if (
-                    self.security_handler.version
-                    <= SecurityHandlerVersion.RC4_OR_AES128
-                ):
-                    data = data[:32]
+                else:
+                    max_length = 32
+                data = data[:max_length]
 
             passwords.extend([str(len(data)), data.hex()])
 

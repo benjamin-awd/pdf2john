@@ -12,15 +12,32 @@ logger = logging.getLogger(__name__)
 
 class Encryption:
     def __init__(self, pdf: PdfFileReader):
-        keys = ("/O", "/U", "/OE", "/UE")
+        keys = ("/U", "/O", "/UE", "/OE")
         encryption_dict = pdf._get_encryption_params()
 
-        self.entries = {
+        self.entries: dict = {
             key: value for key in keys if (value := encryption_dict.get(key))
         }
-        self.algorithm = encryption_dict.get("/V", 0)
-        self.key_length = encryption_dict.get("/Length")
-        self.permissions = encryption_dict["/P"]
+        self._algorithm: int = encryption_dict.get("/V", 0)
+        self._key_length: int = encryption_dict.get("/Length")
+        self._permissions: int = encryption_dict["/P"]
+        self._security_handler_revision: int = encryption_dict["/R"]
+
+    @property
+    def algorithm(self) -> str:
+        return str(self._algorithm)
+
+    @property
+    def key_length(self) -> str:
+        return str(self._key_length)
+
+    @property
+    def permissions(self) -> str:
+        return str(self._permissions)
+
+    @property
+    def security_handler_revision(self) -> str:
+        return str(self._security_handler_revision)
 
 
 class PdfHashExtractor:
@@ -28,44 +45,43 @@ class PdfHashExtractor:
         self.file_name = file_name
 
         with open(file_name, "rb") as doc:
-            pdf = PdfFileReader(doc, strict=False)
-            self.permanent_document_id = pdf.document_id[0]
-            self.encryption = Encryption(pdf)
-            self.security_handler = pdf.security_handler
-            self.encrypt_metadata = pdf.security_handler.encrypt_metadata
+            self.pdf = PdfFileReader(doc, strict=False)
+            self.encryption = Encryption(self.pdf)
+            self.security_handler = self.pdf.security_handler
+
+    @property
+    def document_id(self):
+        return self.pdf.document_id[0]
+
+    @property
+    def encrypt_metadata(self):
+        return str(int(self.security_handler.encrypt_metadata))
 
     def parse(self):
         passwords = self.get_passwords()
 
-        output = (
+        encryption_info = (
             "$pdf$"
-            + str(self.encryption.algorithm)
+            + self.encryption.algorithm
             + "*"
-            + str(self.security_handler.version.value)
+            + self.encryption.security_handler_revision
             + "*"
-            + str(self.encryption.key_length)
-            + "*"
+            + self.encryption.key_length
         )
 
-        output += (
-            str(self.encryption.permissions)
-            + "*"
-            + str(int(self.encrypt_metadata))
-            + "*"
-        )
-        output += (
-            str(int(len(self.permanent_document_id) / 2))
-            + "*"
-            + self.permanent_document_id.hex()
-            + "*"
-            + passwords
+        permissions_info = self.encryption.permissions + "*" + self.encrypt_metadata
+
+        id_info = str(len(self.document_id)) + "*" + self.document_id.hex()
+
+        output = (
+            encryption_info + "*" + permissions_info + "*" + id_info + "*" + passwords
         )
         logger.info("Hash: %s", output)
 
-        return output[:-1]
+        return output
 
     def get_passwords(self):
-        output = ""
+        passwords = []
         entries = self.encryption.entries
 
         for key, data in entries.items():
@@ -80,9 +96,9 @@ class PdfHashExtractor:
                 ):
                     data = data[:32]
 
-            output += str(int(len(data))) + "*" + data.hex() + "*"
+            passwords.extend([str(len(data)), data.hex()])
 
-        return output
+        return "*".join(passwords)
 
 
 if __name__ == "__main__":

@@ -3,10 +3,10 @@
 import logging
 import os
 import sys
+from dataclasses import dataclass
 
 from pyhanko.pdf_utils.crypt import StandardSecuritySettingsRevision
 from pyhanko.pdf_utils.reader import PdfFileReader
-from dataclasses import dataclass
 
 logger = logging.getLogger(__name__)
 
@@ -51,14 +51,14 @@ class PdfHashExtractor:
             self.security_handler = self.pdf.security_handler
 
     @property
-    def document_id(self):
+    def document_id(self) -> bytes:
         return self.pdf.document_id[0]
 
     @property
-    def encrypt_metadata(self):
+    def encrypt_metadata(self) -> str:
         return str(int(self.security_handler.encrypt_metadata))
 
-    def parse(self):
+    def parse(self) -> str:
         passwords = self.get_passwords(
             self.encryption.entries, self.encryption.revision
         )
@@ -76,9 +76,8 @@ class PdfHashExtractor:
 
         return generator.hash
 
-
     @staticmethod
-    def get_passwords(entries, revision):
+    def get_passwords(entries: dict, revision: int):
         passwords = []
 
         for key, data in entries.items():
@@ -97,16 +96,14 @@ class PdfHashExtractor:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        logger.error(f"Usage: {os.path.basename(sys.argv[0])} <PDF file(s)>")
+        logger.error("Usage: %s <PDF file(s)>", {os.path.basename(sys.argv[0])})
         sys.exit(-1)
 
-    for j in range(1, len(sys.argv)):
-        filename = sys.argv[j]
-        logger.info(f"Analyzing {filename}")
+    for filename in sys.argv[1:]:
         extractor = PdfHashExtractor(filename)
 
         try:
-            hash = extractor.parse()
-            print(hash)
-        except RuntimeError as e:
-            logger.error(f"{filename} : {str(e)}")
+            pdf_hash = extractor.parse()
+            print(pdf_hash)
+        except RuntimeError as error:
+            logger.error("%s : %s", filename, error)

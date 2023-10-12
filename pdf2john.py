@@ -5,7 +5,6 @@ import os
 import sys
 from dataclasses import dataclass
 
-from pyhanko.pdf_utils.crypt import StandardSecuritySettingsRevision
 from pyhanko.pdf_utils.reader import PdfFileReader
 
 logger = logging.getLogger(__name__)
@@ -82,8 +81,8 @@ class PdfHashExtractor:
 
         for key, data in entries.items():
             if key in ("/O", "/U"):
-                if revision >= StandardSecuritySettingsRevision.AES256.value:
-                    max_length = 40
+                if revision >= 5:
+                    max_length = 48
 
                 else:
                     max_length = 32

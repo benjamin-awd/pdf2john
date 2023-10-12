@@ -15,6 +15,7 @@ black = "^23.9.1"
 pylint = "^3.0.1"
 isort = "^5.12.0"
 taskipy = "^1.12.0"
+pytest = "^7.4.2"
 
 [tool.pylint]
 disable = [
@@ -30,6 +31,7 @@ max-attributes=9
 [tool.taskipy.tasks]
 format = "isort . && black ."
 lint = "pylint *.py"
+test = "pytest ."
 
 [build-system]
 requires = ["poetry-core"]

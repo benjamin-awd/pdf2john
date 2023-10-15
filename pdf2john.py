@@ -21,7 +21,7 @@ class Entries(Enum):
 class EncryptionDictionary:
     def __init__(self, pdf: PdfFileReader):
         encryption_dict = pdf._get_encryption_params()
-        
+
         if not encryption_dict:
             raise RuntimeError("File not encrypted")
 

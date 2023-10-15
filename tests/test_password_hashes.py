@@ -1,6 +1,7 @@
 """Tests to check that pdf2john.py produces valid hashes for John to use"""
 from conftest import unlock_pdf
 from pytest import mark, raises
+
 from pdf2john import PdfHashExtractor
 
 

@@ -1,3 +1,4 @@
+"""Tests to check that pdf2john.py produces valid hashes for John to use"""
 from conftest import unlock_pdf
 from pytest import mark, raises
 
@@ -28,5 +29,24 @@ def test_wrong_password():
         ("r6-user-password.pdf", "asdfzxcv"),
     ],
 )
-def test_encryption(pdf_name, password):
-    unlock_pdf(f"tests/pdf/{pdf_name}", password)
+def test_pypdf_encryption(pdf_name, password):
+    result = unlock_pdf(f"tests/pdf/pypdf/{pdf_name}", password)
+    if password:
+        assert result == password
+
+
+@mark.parametrize(
+    ("pdf_name", "password"),
+    [
+        # PDFs borrowed from https://github.com/openwall/john-samples/tree/main/PDF
+        ("r2-no-length.pdf", "hashcat"),
+        ("r3-password-1.pdf", "July2099"),
+        ("r3-password-2.pdf", "38r285a9"),
+        ("r3-password-3.pdf", "WHATwhatWHERE?"),
+        ("r3-password-4.pdf", "hashcat"),
+    ],
+)
+def test_john_encryption(pdf_name, password):
+    result = unlock_pdf(f"tests/pdf/john/{pdf_name}", password)
+    if password:
+        assert result == password

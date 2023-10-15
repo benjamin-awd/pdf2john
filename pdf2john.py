@@ -22,7 +22,7 @@ class EncryptionDictionary:
     def __init__(self, pdf: PdfFileReader):
         encryption_dict = pdf._get_encryption_params()
         self.algorithm: int = encryption_dict.get("/V", 0)
-        self.key_length: int = encryption_dict.get("/Length")
+        self.key_length: int = encryption_dict.get("/Length", 40)
         self.permissions: int = encryption_dict["/P"]
         self.revision: int = encryption_dict["/R"]
 

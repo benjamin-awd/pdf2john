@@ -11,8 +11,15 @@ def unlock_pdf(pdf_file_path: str, static_string: str):
     with open(hash_path, "w", encoding="utf-8") as file:
         file.write(pdf_hash)
 
-    mask_command = [f"john --format=PDF --mask={static_string} {hash_path} --pot=.pot"]
-    process = subprocess.run(mask_command, shell=True, check=False)
+    if static_string:
+        run_command = [
+            f"john --format=PDF --mask={static_string} {hash_path} --pot=.pot"
+        ]
+
+    if not static_string:
+        run_command = [f"john --format=PDF {hash_path} --pot=.pot"]
+
+    process = subprocess.run(run_command, shell=True, check=False)
 
     if not process.returncode == 0:
         raise ValueError(f"Return code is not 0: {process}")

@@ -33,7 +33,7 @@ To pass the hash to john:
 ```bash
 python3 pdf2john.py tests/pdf/pypdf/r6-empty-password.pdf >> .hash
 john --format=PDF tests/pdf/pypdf/r6-empty-password.pdf .hash
-john --show --format=PDF .hash 
+john --show --format=PDF .hash
 ```
 
 # Features

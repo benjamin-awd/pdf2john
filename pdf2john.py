@@ -21,11 +21,6 @@ class Entries(Enum):
 class EncryptionDictionary:
     def __init__(self, pdf: PdfFileReader):
         encryption_dict = pdf._get_encryption_params()
-        handler = pdf.security_handler
-
-        self.entries: dict = {
-            enum.name: getattr(handler, enum.value) for enum in Entries
-        }
         self.algorithm: int = encryption_dict.get("/V", 0)
         self.key_length: int = encryption_dict.get("/Length")
         self.permissions: int = encryption_dict["/P"]
@@ -65,16 +60,17 @@ class PdfHashExtractor:
     def encrypt_metadata(self) -> str:
         return str(int(self.security_handler.encrypt_metadata))
 
+    @property
+    def entries(self) -> dict:
+        return {
+            enum.name: getattr(self.security_handler, enum.value) for enum in Entries
+        }
+
     def parse(self) -> str:
-        passwords = self.get_passwords(
-            self.encryption.entries, self.encryption.revision
-        )
+        passwords = self.get_passwords()
 
         generator = HashGenerator(
-            algorithm=self.encryption.algorithm,
-            revision=self.encryption.revision,
-            key_length=self.encryption.key_length,
-            permissions=self.encryption.permissions,
+            **vars(self.encryption),
             encrypt_metadata=self.encrypt_metadata,
             document_id_length=len(self.document_id),
             document_id=self.document_id.hex(),
@@ -83,12 +79,12 @@ class PdfHashExtractor:
 
         return generator.hash
 
-    @staticmethod
-    def get_passwords(entries: dict[str, bytes], revision: int):
+    def get_passwords(self):
         passwords = []
-        for key, data in entries.items():
+
+        for key, data in self.entries.items():
             if data and key in list(Entries.__members__):
-                if revision >= 5:
+                if self.encryption.revision >= 5:
                     max_length = 48
 
                 else:

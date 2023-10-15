@@ -1,6 +1,7 @@
 """Tests to check that pdf2john.py produces valid hashes for John to use"""
 from conftest import unlock_pdf
 from pytest import mark, raises
+from pdf2john import PdfHashExtractor
 
 
 def test_wrong_password():
@@ -50,3 +51,8 @@ def test_john_encryption(pdf_name, password):
     result = unlock_pdf(f"tests/pdf/john/{pdf_name}", password)
     if password:
         assert result == password
+
+
+def test_parse_unencrypted_should_raise_error():
+    with raises(RuntimeError):
+        PdfHashExtractor("tests/pdf/pypdf/unencrypted.pdf")

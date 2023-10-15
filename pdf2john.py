@@ -7,8 +7,36 @@ from dataclasses import dataclass
 from enum import Enum
 
 from pyhanko.pdf_utils.reader import PdfFileReader
+from pyhanko.pdf_utils.crypt import SecurityHandlerVersion
 
 logger = logging.getLogger(__name__)
+
+
+class SecurityRevision(Enum):
+    RC4_BASIC = (2, 32)
+    RC4_EXTENDED = (3, 32)
+    RC4_OR_AES128 = (4, 32)
+    AES_256_R5 = (5, 48)
+    AES256 = (6, 48)
+
+    @property
+    def revision(self):
+        return self.value[0]
+
+    @property
+    def key_length(self):
+        return self.value[1]
+
+    @classmethod
+    def get_key_length(cls, revision):
+        for item in cls:
+            if item.revision == revision:
+                return item.key_length
+        logger.warning(
+            "No explicit key length for revision %s, using default length of 48",
+            revision,
+        )
+        return 48
 
 
 class Entries(Enum):
@@ -71,7 +99,7 @@ class PdfHashExtractor:
         }
 
     def parse(self) -> str:
-        passwords = self.get_passwords()
+        passwords = self.get_passwords(self.entries, self.encryption.revision)
 
         generator = HashGenerator(
             **vars(self.encryption),
@@ -83,18 +111,14 @@ class PdfHashExtractor:
 
         return generator.hash
 
-    def get_passwords(self):
+    @staticmethod
+    def get_passwords(entries: dict[str, bytes], revision: int):
         passwords = []
 
-        for key, data in self.entries.items():
+        for key, data in entries.items():
             if data and key in list(Entries.__members__):
-                if self.encryption.revision >= 5:
-                    max_length = 48
-
-                else:
-                    max_length = 32
+                max_length = SecurityRevision.get_key_length(revision)
                 data = data[:max_length]
-
                 passwords.extend([str(len(data)), data.hex()])
 
         return passwords

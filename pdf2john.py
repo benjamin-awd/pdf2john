@@ -6,8 +6,8 @@ import sys
 from dataclasses import dataclass
 from enum import Enum
 
-from pyhanko.pdf_utils.reader import PdfFileReader
 from pyhanko.pdf_utils.crypt import SecurityHandlerVersion
+from pyhanko.pdf_utils.reader import PdfFileReader
 
 logger = logging.getLogger(__name__)
 
@@ -53,7 +53,9 @@ class EncryptionDictionary:
         if not encryption_dict:
             raise RuntimeError("File not encrypted")
 
-        self.algorithm: int = encryption_dict.get("/V", 0)
+        self.algorithm: int = encryption_dict.get(
+            "/V", SecurityHandlerVersion.RC4_40.value
+        )
         self.key_length: int = encryption_dict.get("/Length", 40)
         self.permissions: int = encryption_dict["/P"]
         self.revision: int = encryption_dict["/R"]

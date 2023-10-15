@@ -102,7 +102,7 @@ class PdfHashExtractor:
 
 if __name__ == "__main__":
     if len(sys.argv) < 2:
-        logger.error("Usage: %s <PDF file(s)>", {os.path.basename(sys.argv[0])})
+        logger.error("Usage: %s <PDF file(s)>", os.path.basename(__file__))
         sys.exit(-1)
 
     for filename in sys.argv[1:]:

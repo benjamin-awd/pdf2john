@@ -4,19 +4,27 @@ import logging
 import os
 import sys
 from dataclasses import dataclass
+from enum import Enum
 
 from pyhanko.pdf_utils.reader import PdfFileReader
 
 logger = logging.getLogger(__name__)
 
 
+class Entries(Enum):
+    U = "udata"
+    O = "odata"
+    OE = "oeseed"
+    UE = "ueseed"
+
+
 class EncryptionDictionary:
     def __init__(self, pdf: PdfFileReader):
-        keys = ("/U", "/O", "/UE", "/OE")
         encryption_dict = pdf._get_encryption_params()
+        handler = pdf.security_handler
 
         self.entries: dict = {
-            key: value for key in keys if (value := encryption_dict.get(key))
+            enum.name: getattr(handler, enum.value) for enum in Entries
         }
         self.algorithm: int = encryption_dict.get("/V", 0)
         self.key_length: int = encryption_dict.get("/Length")
@@ -76,11 +84,10 @@ class PdfHashExtractor:
         return generator.hash
 
     @staticmethod
-    def get_passwords(entries: dict, revision: int):
+    def get_passwords(entries: dict[str, bytes], revision: int):
         passwords = []
-
         for key, data in entries.items():
-            if key in ("/O", "/U"):
+            if data and key in list(Entries.__members__):
                 if revision >= 5:
                     max_length = 48
 
@@ -88,7 +95,7 @@ class PdfHashExtractor:
                     max_length = 32
                 data = data[:max_length]
 
-            passwords.extend([str(len(data)), data.hex()])
+                passwords.extend([str(len(data)), data.hex()])
 
         return passwords
 

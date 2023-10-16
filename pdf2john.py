@@ -3,7 +3,6 @@
 import logging
 import os
 import sys
-from dataclasses import dataclass
 from enum import Enum
 
 from pyhanko.pdf_utils.crypt import SecurityHandlerVersion
@@ -42,8 +41,8 @@ class SecurityRevision(Enum):
 class Entries(Enum):
     U = "udata"
     O = "odata"
-    OE = "oeseed"
     UE = "ueseed"
+    OE = "oeseed"
 
 
 class EncryptionDictionary:
@@ -59,22 +58,6 @@ class EncryptionDictionary:
         self.key_length: int = encryption_dict.get("/Length", 40)
         self.permissions: int = encryption_dict["/P"]
         self.revision: int = encryption_dict["/R"]
-
-
-@dataclass(kw_only=True)
-class HashGenerator:
-    algorithm: int
-    revision: int
-    key_length: int
-    permissions: int
-    encrypt_metadata: bool
-    document_id_length: int
-    document_id: str
-    passwords: list
-
-    def __post_init__(self):
-        self.passwords = "*".join(self.passwords)
-        self.hash = "$pdf$" + "*".join([str(value) for value in self.__dict__.values()])
 
 
 class PdfHashExtractor:
@@ -102,19 +85,20 @@ class PdfHashExtractor:
 
     def parse(self) -> str:
         passwords = self.get_passwords(self.entries, self.encryption.revision)
-
-        generator = HashGenerator(
-            **vars(self.encryption),
-            encrypt_metadata=self.encrypt_metadata,
-            document_id_length=len(self.document_id),
-            document_id=self.document_id.hex(),
-            passwords=passwords,
-        )
-
-        return generator.hash
+        fields = [
+            f"$pdf${self.encryption.algorithm}",
+            self.encryption.revision,
+            self.encryption.key_length,
+            self.encryption.permissions,
+            self.encrypt_metadata,
+            len(self.document_id),
+            self.document_id.hex(),
+            passwords,
+        ]
+        return "*".join(map(str, fields))
 
     @staticmethod
-    def get_passwords(entries: dict[str, bytes], revision: int):
+    def get_passwords(entries: dict[str, bytes], revision: int) -> str:
         passwords = []
 
         for key, data in entries.items():
@@ -123,7 +107,7 @@ class PdfHashExtractor:
                 data = data[:max_length]
                 passwords.extend([str(len(data)), data.hex()])
 
-        return passwords
+        return "*".join(passwords)
 
 
 if __name__ == "__main__":

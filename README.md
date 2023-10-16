@@ -45,7 +45,6 @@ john --show --format=PDF .hash
 
 ## Features
 - Responsibility for PDF parsing and handling has been delegated to [pyHanko](https://github.com/MatthiasValvekens/pyHanko) (a crytography focused fork of PyPDF2)
-- Use of modern OOP structures e.g. dataclasses for better organization and separation of concerns
 - CICD workflow that tests pdf2john against PDFs ranging from Security Handler Revision 2 -> 6
 - Removal of legacy Python 2.x support
 

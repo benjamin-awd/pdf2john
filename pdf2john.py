@@ -37,9 +37,16 @@ class SecurityRevision:
 class PdfHashExtractor:
     """
     Extracts hash and encryption information from a PDF file
+
+    Attributes:
+    - `file_name`: PDF file path.
+    - `algorithm`: Encryption algorithm used by the standard security handler
+    - `length`: The length of the encryption key, in bits. Defaults to 40.
+    - `permissions`: User access permissions
+    - `revision`: Revision of the standard security handler
     """
 
-    def __init__(self, file_name):
+    def __init__(self, file_name: str):
         self.file_name = file_name
 
         with open(file_name, "rb") as doc:

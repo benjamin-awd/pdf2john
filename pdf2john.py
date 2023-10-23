@@ -40,17 +40,20 @@ class PdfHashExtractor:
 
     Attributes:
     - `file_name`: PDF file path.
+    - `strict`: Boolean that controls whether an error is raised, if a PDF
+        has problems multiple e.g. Multiple definitions in encryption dictionary
+        for a specific key. Defaults to `False`.
     - `algorithm`: Encryption algorithm used by the standard security handler
     - `length`: The length of the encryption key, in bits. Defaults to 40.
     - `permissions`: User access permissions
     - `revision`: Revision of the standard security handler
     """
 
-    def __init__(self, file_name: str):
+    def __init__(self, file_name: str, strict: bool = False):
         self.file_name = file_name
 
         with open(file_name, "rb") as doc:
-            self.pdf = PdfFileReader(doc, strict=False)
+            self.pdf = PdfFileReader(doc, strict=strict)
             self.encrypt_dict = self.pdf._get_encryption_params()
 
             if not self.encrypt_dict:

@@ -1,9 +1,9 @@
 #!/usr/bin/env python
 
+import argparse
 import logging
-import os
-import sys
 
+from pyhanko.pdf_utils.misc import PdfReadError
 from pyhanko.pdf_utils.reader import PdfFileReader
 
 logger = logging.getLogger(__name__)
@@ -44,15 +44,15 @@ class PdfHashExtractor:
 
         with open(file_name, "rb") as doc:
             self.pdf = PdfFileReader(doc, strict=False)
-            encrypt_dict = self.pdf._get_encryption_params()
+            self.encrypt_dict = self.pdf._get_encryption_params()
 
-            if not encrypt_dict:
+            if not self.encrypt_dict:
                 raise RuntimeError("File not encrypted")
 
-            self.algorithm: int = encrypt_dict.get("/V")
-            self.length: int = encrypt_dict.get("/Length", 40)
-            self.permissions: int = encrypt_dict["/P"]
-            self.revision: int = encrypt_dict["/R"]
+            self.algorithm: int = self.encrypt_dict.get("/V")
+            self.length: int = self.encrypt_dict.get("/Length", 40)
+            self.permissions: int = self.encrypt_dict["/P"]
+            self.revision: int = self.encrypt_dict["/R"]
 
     @property
     def document_id(self) -> bytes:
@@ -102,15 +102,28 @@ class PdfHashExtractor:
 
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        logger.error("Usage: %s <PDF file(s)>", os.path.basename(__file__))
-        sys.exit(-1)
+    parser = argparse.ArgumentParser(description="PDF Hash Extractor")
+    parser.add_argument(
+        "pdf_files", nargs="+", help="PDF file(s) to extract information from"
+    )
+    parser.add_argument(
+        "-d", "--debug", action="store_true", help="Print the encryption dictionary"
+    )
+    args = parser.parse_args()
 
-    for filename in sys.argv[1:]:
-        extractor = PdfHashExtractor(filename)
-
+    for filename in args.pdf_files:
         try:
+            extractor = PdfHashExtractor(filename)
             pdf_hash = extractor.parse()
             print(pdf_hash)
-        except RuntimeError as error:
-            logger.error("%s : %s", filename, error)
+
+            if args.debug:
+                if extractor.encrypt_dict:
+                    print("Encryption Dictionary:")
+                    for key, value in extractor.encrypt_dict.items():
+                        print(f"{key}: {value}")
+                else:
+                    print("No encryption dictionary found in the PDF.")
+
+        except PdfReadError as error:
+            logger.error("%s : %s", filename, error, exc_info=True)

@@ -47,7 +47,14 @@ john --show --format=PDF .hash
 - Responsibility for PDF parsing and handling has been delegated to [pyHanko](https://github.com/MatthiasValvekens/pyHanko) (a crytography focused fork of PyPDF2)
 - CICD workflow that tests pdf2john against PDFs ranging from Security Handler Revision 2 -> 6
 - Removal of legacy Python 2.x support
+- An optional debugging flag that shows the encryption dictionary of a PDF
 - Readability improvements (a general attempt to be more Pythonic)
 
+## Troubleshooting
+To access the encryption dictionary:
+```bash
+python3 pdf2john.py tests/pdf/pypdf/r6-user-password.pdf --debug
+```
+
 ## Acknowledgement
-This repository was based on the original pdf2john.py code by [Shane Quigley](https://github.com/ShaneQful)
+This repository was based on the original pdf2john.py by [Shane Quigley](https://github.com/ShaneQful)

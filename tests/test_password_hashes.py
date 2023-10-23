@@ -1,5 +1,8 @@
 """Tests to check that pdf2john.py produces valid hashes for John to use"""
+from tempfile import NamedTemporaryFile
+
 from conftest import unlock_pdf
+from pyhanko.pdf_utils.misc import PdfReadError
 from pytest import mark, raises
 
 from pdf2john import PdfHashExtractor
@@ -57,3 +60,10 @@ def test_john_encryption(pdf_name, password):
 def test_parse_unencrypted_should_raise_error():
     with raises(RuntimeError):
         PdfHashExtractor("tests/pdf/pypdf/unencrypted.pdf")
+
+
+def test_invalid_pdf():
+    with NamedTemporaryFile(suffix="foo.pdf", delete=True) as temp_file:
+        temp_file.write(b"This is an invalid PDF file")
+        with raises(PdfReadError):
+            PdfHashExtractor(temp_file.name)

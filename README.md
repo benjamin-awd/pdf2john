@@ -33,13 +33,13 @@ pip install -r requirements.txt
 ## Usage
 Run pdf2john.py with a PDF of choice
 ```bash
-python3 pdf2john.py tests/pdf/pypdf/r6-user-password.pdf
+./pdf2john.py example.pdf
 ```
 
 To pass the hash to john:
 ```bash
-python3 pdf2john.py tests/pdf/pypdf/r6-empty-password.pdf >> .hash
-john --format=PDF tests/pdf/pypdf/r6-empty-password.pdf .hash
+./pdf2john.py example.pdf >> .hash
+john .hash
 john --show --format=PDF .hash
 ```
 
@@ -53,7 +53,7 @@ john --show --format=PDF .hash
 ## Troubleshooting
 To access the encryption dictionary:
 ```bash
-python3 pdf2john.py tests/pdf/pypdf/r6-user-password.pdf --debug
+./pdf2john.py tests/pdf/pypdf/r6-user-password.pdf --debug
 ```
 
 ## Acknowledgement

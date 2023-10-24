@@ -1,10 +1,20 @@
-#!/usr/bin/python3
+#!/usr/bin/env python3
+
+# This software is Copyright (c) 2023 Benjamin Dornel <benjamindornel@gmail.com>
+# and it is hereby released to the general public under the following terms:
+# Redistribution and use in source and binary forms, with or without
+# modification, are permitted.
+
 
 import argparse
 import logging
 
-from pyhanko.pdf_utils.misc import PdfReadError
-from pyhanko.pdf_utils.reader import PdfFileReader
+try:
+    from pyhanko.pdf_utils.misc import PdfReadError
+    from pyhanko.pdf_utils.reader import PdfFileReader
+except ImportError:
+    print("pyhanko is missing, run 'pip install --user pyhanko==0.20.1' to install it!")
+    exit(1)
 
 logger = logging.getLogger(__name__)
 

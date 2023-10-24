@@ -41,7 +41,7 @@ class PdfHashExtractor:
     Attributes:
     - `file_name`: PDF file path.
     - `strict`: Boolean that controls whether an error is raised, if a PDF
-        has problems multiple e.g. Multiple definitions in encryption dictionary
+        has problems e.g. Multiple definitions in encryption dictionary
         for a specific key. Defaults to `False`.
     - `algorithm`: Encryption algorithm used by the standard security handler
     - `length`: The length of the encryption key, in bits. Defaults to 40.

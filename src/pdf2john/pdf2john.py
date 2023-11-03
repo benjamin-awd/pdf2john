@@ -111,7 +111,7 @@ class PdfHashExtractor:
         return "*".join(passwords)
 
 
-if __name__ == "__main__":
+def main() -> None:
     parser = argparse.ArgumentParser(description="PDF Hash Extractor")
     parser.add_argument(
         "pdf_files", nargs="+", help="PDF file(s) to extract information from"
@@ -137,3 +137,7 @@ if __name__ == "__main__":
 
         except PdfReadError as error:
             logger.error("%s : %s", filename, error, exc_info=True)
+
+
+if __name__ == "__main__":
+    main()

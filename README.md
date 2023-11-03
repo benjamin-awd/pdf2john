@@ -5,7 +5,7 @@
 [![Linting: pylint](https://img.shields.io/badge/linting-pylint-orange)](https://github.com/pylint-dev/pylint)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
-This repository is a modern refactoring of the legacy pdf2john.py library, aimed at making the code easier to read and maintain.
+A modern refactoring of the legacy pdf2john.py library, aimed at making the code easier to read and maintain.
 
 ## Install
 Install dependencies using [Homebrew](https://brew.sh/)

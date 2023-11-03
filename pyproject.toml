@@ -1,10 +1,16 @@
 [tool.poetry]
 name = "pdf2john"
-version = "0.1.5"
-description = ""
+version = "0.1.6"
+description = "A modern refactoring of the legacy pdf2john library"
 authors = ["Benjamin Dornel <benjamindornel@gmail.com>"]
 license = "MIT"
+repository = "https://github.com/benjamin-awd/pdf2john"
 readme = "README.md"
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Programming Language :: Python :: 3.11",
+    "Topic :: Security"
+]
 
 [tool.poetry.dependencies]
 python = "^3.11"

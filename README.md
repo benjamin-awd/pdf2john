@@ -22,25 +22,20 @@ Create a virtual environment and install Python dependencies
 ```bash
 pyenv virtualenv 3.11.4 pdf2john
 pyenv shell pdf2john
-poetry install
-```
-
-or if you don't want to use a virtual environment, simply
-```bash
-pip install -r requirements.txt
+poetry install --only main
 ```
 
 ## Usage
-Run pdf2john.py with a PDF of choice
-```bash
-./pdf2john.py example.pdf
-```
-
 To pass the hash to john:
 ```bash
-./pdf2john.py example.pdf >> .hash
+pdf2john example.pdf >> .hash
 john .hash
 john --show --format=PDF .hash
+```
+
+If you don't want to install pdf2john, you can run it as a standalone script:
+```bash
+./src/pdf2john/pdf2john.py example.pdf >> .hash
 ```
 
 ## Features

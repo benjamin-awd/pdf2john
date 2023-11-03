@@ -1,9 +1,11 @@
 import subprocess
 
+from pytest import mark
 
-def run_cli(args, input_text=None):
+
+def run_cli(args: list, cmd: str = "pdf2john", input_text=None):
     process = subprocess.Popen(
-        ["python3", "pdf2john.py"] + args,
+        [cmd] + args,
         stdout=subprocess.PIPE,
         stderr=subprocess.PIPE,
         stdin=subprocess.PIPE,
@@ -13,9 +15,10 @@ def run_cli(args, input_text=None):
     return process, stdout, stderr
 
 
-def test_cli_extraction():
+@mark.parametrize("cmd", ["pdf2john", "./src/pdf2john/pdf2john.py"])
+def test_cli_extraction(cmd):
     pdf_file = "tests/pdf/r6-test-bad-password.pdf"
-    process, stdout, _ = run_cli([pdf_file])
+    process, stdout, _ = run_cli(cmd=cmd, args=[pdf_file])
 
     expected = "$pdf$5*6*256*-4*1*16*fce2fe96b7e142b4a0576f61e2e9c441*48*aef6c4bf5e8a0f3bb1adef2b8ac2367d1ce95ecc1ddc3243ce49786086a023aa310aa9f7d1d103f837e4d4f738ac913d*48*eabf37f3f1f1b208f7c8ddfad3b817c689889ecbadd30f4581382cfbf79806304fb438e9ca227a023138a38eadcf82f3*32*37afcbfcbb32d4e1bca1eb10165693a1633ebb742c00045177a284ba22196937*32*3459a644d5f4c4f7cee562b754b30df48d598e1911ea513ef29bb3928593caf3"
     assert process.returncode == 0

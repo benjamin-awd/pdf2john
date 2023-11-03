@@ -3,7 +3,7 @@ from tempfile import NamedTemporaryFile
 
 from conftest import unlock_pdf
 from pyhanko.pdf_utils.misc import PdfReadError
-from pytest import mark, raises
+from pytest import LogCaptureFixture, mark, raises
 
 from pdf2john import PdfHashExtractor
 
@@ -57,9 +57,10 @@ def test_john_encryption(pdf_name, password):
         assert result == password
 
 
-def test_parse_unencrypted_should_raise_error():
-    with raises(RuntimeError):
-        PdfHashExtractor("tests/pdf/pypdf/unencrypted.pdf")
+def test_parse_unencrypted_should_raise_error(caplog: LogCaptureFixture):
+    extractor = PdfHashExtractor("tests/pdf/pypdf/unencrypted.pdf")
+    assert not extractor.encrypt_dict
+    assert caplog.records[0].msg == "File is not encrypted"
 
 
 def test_invalid_pdf():

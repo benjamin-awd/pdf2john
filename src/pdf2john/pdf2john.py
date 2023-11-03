@@ -2,6 +2,7 @@
 
 import argparse
 import logging
+import sys
 
 from pyhanko.pdf_utils.misc import PdfReadError
 from pyhanko.pdf_utils.reader import PdfFileReader
@@ -57,7 +58,8 @@ class PdfHashExtractor:
             self.encrypt_dict = self.pdf._get_encryption_params()
 
             if not self.encrypt_dict:
-                raise RuntimeError("File not encrypted")
+                logger.warning("File is not encrypted")
+                return None
 
             self.algorithm: int = self.encrypt_dict.get("/V")
             self.length: int = self.encrypt_dict.get("/Length", 40)
@@ -124,6 +126,8 @@ def main() -> None:
     for filename in args.pdf_files:
         try:
             extractor = PdfHashExtractor(filename)
+            if not extractor.encrypt_dict:
+                sys.exit(-1)
             pdf_hash = extractor.parse()
             print(pdf_hash)
 

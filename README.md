@@ -8,11 +8,6 @@
 This repository is a modern refactoring of the legacy pdf2john.py library, aimed at making the code easier to read and maintain.
 
 ## Install
-Clone the repo
-```bash
-git clone https://github.com/benjamin-awd/pdf2john.git
-```
-
 Install dependencies using [Homebrew](https://brew.sh/)
 ```bash
 brew bundle
@@ -33,8 +28,10 @@ john .hash
 john --show --format=PDF .hash
 ```
 
-If you don't want to install pdf2john, you can run it as a standalone script:
+If you don't want to use poetry, you can run pdf2john as a standalone script:
 ```bash
+git clone https://github.com/benjamin-awd/pdf2john.git
+cd pdf2john && pip install -r requirements.txt
 ./src/pdf2john/pdf2john.py example.pdf >> .hash
 ```
 

@@ -58,7 +58,7 @@ class PdfHashExtractor:
             self.encrypt_dict = self.pdf._get_encryption_params()
 
             if not self.encrypt_dict:
-                logger.warning("File is not encrypted")
+                logger.warning("%s is not encrypted", file_name)
                 return None
 
             self.algorithm: int = self.encrypt_dict.get("/V")
@@ -127,6 +127,7 @@ def main() -> None:
         try:
             extractor = PdfHashExtractor(filename)
             if not extractor.encrypt_dict:
+                print(f"{filename} is not encrypted")
                 sys.exit(-1)
             pdf_hash = extractor.parse()
             print(pdf_hash)

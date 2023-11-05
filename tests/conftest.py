@@ -1,6 +1,13 @@
 import subprocess
 
+import pytest
+
 from pdf2john import PdfHashExtractor
+
+
+@pytest.fixture
+def unencrypted_pdf_path() -> str:
+    return "tests/pdf/pypdf/unencrypted.pdf"
 
 
 def unlock_pdf(pdf_file_path: str, static_string: str):

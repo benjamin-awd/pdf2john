@@ -55,7 +55,7 @@ class PdfHashExtractor:
 
         with open(file_name, "rb") as doc:
             self.pdf = PdfFileReader(doc, strict=strict)
-            self.encrypt_dict = self.pdf._get_encryption_params()
+            self.encrypt_dict = self.pdf.encrypt_dict
 
             if not self.encrypt_dict:
                 logger.warning("%s is not encrypted", file_name)

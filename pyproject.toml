@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "pdf2john"
-version = "0.1.9"
+version = "0.1.10"
 description = "A modern refactoring of the legacy pdf2john library"
 authors = ["Benjamin Dornel <benjamindornel@gmail.com>"]
 license = "MIT"

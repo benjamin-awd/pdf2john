@@ -14,7 +14,7 @@ classifiers = [
 
 [tool.poetry.dependencies]
 python = "^3.11"
-pyhanko = "^0.21.0"
+pyhanko = ">=0.21,<0.24"
 
 [tool.poetry.group.dev.dependencies]
 black = ">=23.9.1,<25.0.0"

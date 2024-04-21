@@ -21,8 +21,18 @@ def test_main_unencrypted(unencrypted_pdf_path, caplog):
 
 
 def test_parse_unencrypted_should_not_return_encrypt_dict(unencrypted_pdf_path):
-    extractor = PdfHashExtractor(unencrypted_pdf_path)
-    assert not extractor.encrypt_dict
+    pdf = PdfHashExtractor(unencrypted_pdf_path)
+    assert not pdf.encrypt_dict
+
+
+def test_can_read_from_byte_stream():
+    with open("tests/pdf/pypdf/r6-owner-password.pdf", "rb") as file:
+        file_bytes = file.read()
+        pdf = PdfHashExtractor(file_bytes=file_bytes)
+        assert pdf.algorithm == 5
+        assert pdf.length == 256
+        assert pdf.permissions == -4
+        assert pdf.revision == 6
 
 
 def test_invalid_pdf():

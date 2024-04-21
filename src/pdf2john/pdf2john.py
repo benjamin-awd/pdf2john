@@ -3,6 +3,8 @@
 import argparse
 import logging
 import sys
+from io import BytesIO
+from typing import Optional
 
 from pyhanko.pdf_utils.misc import PdfReadError
 from pyhanko.pdf_utils.reader import PdfFileReader
@@ -50,11 +52,22 @@ class PdfHashExtractor:
     - `revision`: Revision of the standard security handler
     """
 
-    def __init__(self, file_name: str, strict: bool = False):
-        self.file_name = file_name
+    def __init__(
+        self,
+        file_name: Optional[str] = None,
+        file_bytes: Optional[str] = None,
+        strict: bool = False,
+    ):
+        if not any([file_name, file_bytes]):
+            raise RuntimeError("Either file name or file stream must be passed")
 
-        with open(file_name, "rb") as doc:
-            self.pdf = PdfFileReader(doc, strict=strict)
+        if file_bytes:
+            stream = BytesIO(file_bytes)
+        else:
+            stream = open(file_name, "rb")
+
+        with stream:
+            self.pdf = PdfFileReader(stream, strict=strict)
             self.encrypt_dict = self.pdf.encrypt_dict
 
             if not self.encrypt_dict:

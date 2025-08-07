@@ -9,13 +9,13 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v4
 
-      - name: Setup Python & Poetry
-        uses: ./.github/actions/setup-python-poetry
-        with:
-          python-version: "3.11"
-          poetry-version: "1.6.1"
+      - name: Install uv
+        uses: astral-sh/setup-uv@v5
 
-      - name: Run CI
+      - name: Set up Python
+        run: uv python install
+
+      - name: Install StatementSensei dependencies
         run: |
-          poetry run task format
-          poetry run task lint
+          uv venv
+          uv sync

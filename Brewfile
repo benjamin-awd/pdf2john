@@ -1,3 +1,1 @@
-brew "poetry"
-brew "pyenv"
-brew "pyenv-virtualenv"
+brew "uv"

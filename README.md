@@ -15,9 +15,9 @@ brew bundle
 
 Create a virtual environment and install Python dependencies
 ```bash
-pyenv virtualenv 3.11.4 pdf2john
-pyenv shell pdf2john
-poetry install --only main
+uv venv
+source .venv/bin/activate
+uv sync
 ```
 
 ## Usage

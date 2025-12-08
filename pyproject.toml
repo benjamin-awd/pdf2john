@@ -3,7 +3,7 @@ name = "pdf2john"
 version = "0.2.0"
 description = "A modern refactoring of the legacy pdf2john library"
 authors = [{ name = "Benjamin Dornel", email = "benjamindornel@gmail.com" }]
-requires-python = "~=3.11"
+requires-python = ">=3.11.0, <3.13"
 readme = "README.md"
 license = "MIT"
 classifiers = [
@@ -12,8 +12,8 @@ classifiers = [
     "Topic :: Security",
 ]
 dependencies = [
-    "cffi==1.17.1",
-    "pyhanko>=0.21,<0.30",
+    "cffi==2.0.0",
+    "pyhanko>=0.31,<0.40",
 ]
 
 [project.urls]

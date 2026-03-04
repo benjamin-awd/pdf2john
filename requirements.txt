@@ -1,1 +1,1 @@
-pyhanko==0.32.0
+pyhanko==0.33.0

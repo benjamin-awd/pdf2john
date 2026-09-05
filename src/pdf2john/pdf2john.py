@@ -76,10 +76,17 @@ class PdfHashExtractor:
 
             if self.encrypt_dict.get("/Filter") != "/Standard":
                 handler = self.encrypt_dict.get("/Filter", "an unknown type")
-                raise ValueError(
+                message = (
                     f"Unsupported security handler found: {handler}. "
                     "This script only supports the standard PDF password security handler."
                 )
+                if handler in ("/Adobe.PubSec", "/PubSec"):
+                    message += (
+                        " This PDF uses certificate-based (public-key) encryption, "
+                        "which is not password-protected and cannot be cracked with "
+                        "john/hashcat -- it requires the recipient's private key to open."
+                    )
+                raise ValueError(message)
 
             self.algorithm: int = self.encrypt_dict.get("/V")
             self.length: int = self.encrypt_dict.get("/Length", 40)

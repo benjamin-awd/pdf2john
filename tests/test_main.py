@@ -16,7 +16,7 @@ def test_main_unencrypted(unencrypted_pdf_path, caplog):
         with raises(SystemExit) as e:
             main()
 
-        assert e.value.code == -1
+        assert e.value.code == 1
         assert f"{unencrypted_pdf_path} is not encrypted" in caplog.text
 
 

@@ -55,13 +55,13 @@ class PdfHashExtractor:
     def __init__(
         self,
         file_name: Optional[str] = None,
-        file_bytes: Optional[str] = None,
+        file_bytes: Optional[bytes] = None,
         strict: bool = False,
     ):
-        if not any([file_name, file_bytes]):
+        if file_name is None and file_bytes is None:
             raise RuntimeError("Either file name or file stream must be passed")
 
-        if file_bytes:
+        if file_bytes is not None:
             stream = BytesIO(file_bytes)
         else:
             stream = open(file_name, "rb")
@@ -143,25 +143,29 @@ def main() -> None:
     )
     args = parser.parse_args()
 
+    logging.basicConfig(level=logging.INFO, format="%(levelname)s: %(message)s")
+
+    exit_code = 0
     for filename in args.pdf_files:
         try:
             extractor = PdfHashExtractor(filename)
             if not extractor.encrypt_dict:
                 print(f"{filename} is not encrypted")
-                sys.exit(-1)
+                exit_code = 1
+                continue
             pdf_hash = extractor.parse()
             print(pdf_hash)
 
             if args.debug:
-                if extractor.encrypt_dict:
-                    print("Encryption Dictionary:")
-                    for key, value in extractor.encrypt_dict.items():
-                        print(f"{key}: {value}")
-                else:
-                    print("No encryption dictionary found in the PDF.")
+                print("Encryption Dictionary:")
+                for key, value in extractor.encrypt_dict.items():
+                    print(f"{key}: {value}")
 
         except PdfReadError as error:
             logger.error("%s : %s", filename, error, exc_info=True)
+            exit_code = 1
+
+    sys.exit(exit_code)
 
 
 if __name__ == "__main__":

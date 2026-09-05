@@ -1,8 +1,8 @@
 # pdf2john
-[![Tests](https://github.com/benjamin-awd/pdf2john/workflows/tests/badge.svg)](https://github.com/pdf2john-awd/monopoly/actions)
-[![CI](https://github.com/benjamin-awd/pdf2john/workflows/ci/badge.svg)](https://github.com/pdf2john/monopoly/actions)
+[![Tests](https://github.com/benjamin-awd/pdf2john/actions/workflows/tests.yaml/badge.svg)](https://github.com/benjamin-awd/pdf2john/actions/workflows/tests.yaml)
+[![CI](https://github.com/benjamin-awd/pdf2john/actions/workflows/ci.yaml/badge.svg)](https://github.com/benjamin-awd/pdf2john/actions/workflows/ci.yaml)
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
-[![Linting: pylint](https://img.shields.io/badge/linting-pylint-orange)](https://github.com/pylint-dev/pylint)
+[![Linting: ruff](https://img.shields.io/badge/linting-ruff-orange)](https://github.com/astral-sh/ruff)
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
 A modern refactoring of the legacy pdf2john.py library, aimed at making the code easier to read and maintain.
